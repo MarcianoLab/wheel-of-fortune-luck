@@ -184,20 +184,15 @@ Qualtrics.SurveyEngine.addOnload(function() {
         }
 
         let finalLuckScore = isCatchTrialActive ? tempLuckScore : parseInt(selectedRating, 10);
-        let finalAttSelected = isCatchTrialActive ? parseInt(selectedRating, 10) : null;
-        let finalAttTarget = isCatchTrialActive ? currentCatchTarget : null;
         let finalAttPassed = isCatchTrialActive ? (finalAttSelected === finalAttTarget) : null;
-
+    
         logTrialData({
             trial_number: currentTrial,
-            version: experimentVersionName,
             bet_size: currentBetSize,
             degree_landed: targetAngle,
             outcome: outcome,
             bankroll: bankroll,
             lucky_score: finalLuckScore,
-            attention_target: finalAttTarget,
-            attention_selected: finalAttSelected,
             attention_passed: finalAttPassed
         });
 
@@ -238,14 +233,11 @@ Qualtrics.SurveyEngine.addOnload(function() {
 
     function logTrialData(payload) {
         var t = payload.trial_number;
-        Qualtrics.SurveyEngine.setEmbeddedData('T' + t + '_version', payload.version);
         Qualtrics.SurveyEngine.setEmbeddedData('T' + t + '_bet_size', payload.bet_size);
         Qualtrics.SurveyEngine.setEmbeddedData('T' + t + '_degree_landed', payload.degree_landed);
         Qualtrics.SurveyEngine.setEmbeddedData('T' + t + '_outcome', payload.outcome);
         Qualtrics.SurveyEngine.setEmbeddedData('T' + t + '_bankroll', payload.bankroll);
         Qualtrics.SurveyEngine.setEmbeddedData('T' + t + '_lucky_score', payload.lucky_score);
-        Qualtrics.SurveyEngine.setEmbeddedData('T' + t + '_attention_target', payload.attention_target);
-        Qualtrics.SurveyEngine.setEmbeddedData('T' + t + '_attention_selected', payload.attention_selected);
         Qualtrics.SurveyEngine.setEmbeddedData('T' + t + '_attention_passed', payload.attention_passed);
     }
 
