@@ -189,6 +189,49 @@
     display: block;
   }
 
+  #wof-payoff-panel {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: #f8fafc;
+  }
+
+  .wof-payoff-item {
+    flex: 1;
+    padding: 10px 8px;
+    border-radius: 6px;
+    background: #ffffff;
+    text-align: center;
+  }
+
+  .wof-payoff-label {
+    display: block;
+    margin-bottom: 3px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .wof-payoff-value {
+    color: #020617;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  #wof-payoff-win {
+    color: #15803d;
+  }
+
+  #wof-payoff-loss {
+    color: #b91c1c;
+  }
+
   .wof-panel-title {
     margin-bottom: 12px;
     color: #334155;
@@ -276,7 +319,7 @@
 
   .wof-modal-panel {
     width: 100%;
-    max-width: 430px;
+    max-width: 620px;
     padding: 22px;
     border-radius: 8px;
     background: #ffffff;
@@ -285,9 +328,18 @@
 
   #wof-modal-title {
     color: #020617;
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 800;
     line-height: 1.3;
+    text-align: center;
+  }
+
+  #wof-modal-title.is-win {
+    color: #15803d;
+  }
+
+  #wof-modal-title.is-loss {
+    color: #b91c1c;
   }
 
   #wof-modal-message {
@@ -297,11 +349,35 @@
     line-height: 1.6;
   }
 
+  #wof-modal-message:empty {
+    display: none;
+  }
+
   #wof-rating-buttons {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(10, 1fr);
     gap: 8px;
     margin-top: 20px;
+  }
+
+  .wof-scale-labels {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    margin-top: 6px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .wof-scale-low {
+    grid-column: 1 / span 3;
+    text-align: left;
+  }
+
+  .wof-scale-high {
+    grid-column: 8 / span 3;
+    text-align: right;
   }
 
   .wof-rating-button.is-active {
@@ -355,6 +431,15 @@
       width: min(86vw, 330px);
       height: min(86vw, 330px);
     }
+
+    #wof-rating-buttons {
+      gap: 4px;
+    }
+
+    .wof-rating-button {
+      min-height: 38px;
+      font-size: 12px;
+    }
   }
 </style>
 
@@ -392,6 +477,17 @@
     <div class="wof-controls">
       <div id="wof-assigned-wager">The system has assigned this spin.</div>
 
+      <div id="wof-payoff-panel" aria-live="polite">
+        <div class="wof-payoff-item">
+          <span class="wof-payoff-label">Win</span>
+          <span id="wof-payoff-win" class="wof-payoff-value">+5 tokens</span>
+        </div>
+        <div class="wof-payoff-item">
+          <span class="wof-payoff-label">Loss</span>
+          <span id="wof-payoff-loss" class="wof-payoff-value">-5 tokens</span>
+        </div>
+      </div>
+
       <div id="wof-bet-panel">
         <div class="wof-panel-title">Wager</div>
         <div id="wof-bet-buttons">
@@ -411,9 +507,13 @@
       <div id="wof-modal-title">Result</div>
       <div id="wof-modal-message"></div>
       <div id="wof-rating-buttons"></div>
+      <div id="wof-scale-labels" class="wof-scale-labels">
+        <div class="wof-scale-low">not lucky</div>
+        <div class="wof-scale-high">extremely lucky</div>
+      </div>
       <button id="wof-next-button" type="button" disabled>Next</button>
     </div>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/gh/MarcianoLab/wheel-of-fortune-luck@main/script.js?v=3"></script>
+<script src="https://cdn.jsdelivr.net/gh/MarcianoLab/wheel-of-fortune-luck@test1/script.js?v=4"></script>

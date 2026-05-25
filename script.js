@@ -160,6 +160,8 @@
     els.bankroll = document.getElementById("wof-bankroll");
     els.betPanel = document.getElementById("wof-bet-panel");
     els.assignedWager = document.getElementById("wof-assigned-wager");
+    els.payoffWin = document.getElementById("wof-payoff-win");
+    els.payoffLoss = document.getElementById("wof-payoff-loss");
     els.betButtons = Array.prototype.slice.call(document.querySelectorAll(".wof-bet-button"));
     els.spinButton = document.getElementById("wof-spin-button");
     els.status = document.getElementById("wof-status");
@@ -168,6 +170,7 @@
     els.modalTitle = document.getElementById("wof-modal-title");
     els.modalMessage = document.getElementById("wof-modal-message");
     els.ratingButtons = document.getElementById("wof-rating-buttons");
+    els.scaleLabels = document.getElementById("wof-scale-labels");
     els.nextButton = document.getElementById("wof-next-button");
   }
 
@@ -203,6 +206,18 @@
     }
   }
 
+  function updatePayoffPanel() {
+    var betText = state.currentBet === null ? "-" : state.currentBet + " token" + (state.currentBet === 1 ? "" : "s");
+
+    if (els.payoffWin) {
+      els.payoffWin.textContent = state.currentBet === null ? "+ -" : "+" + betText;
+    }
+
+    if (els.payoffLoss) {
+      els.payoffLoss.textContent = state.currentBet === null ? "- -" : "-" + betText;
+    }
+  }
+
   function setBetButtonState() {
     els.betButtons.forEach(function (button) {
       var bet = Number(button.getAttribute("data-bet"));
@@ -234,6 +249,7 @@
     }
 
     updateConditionControls();
+    updatePayoffPanel();
     updateProgress();
     setBetButtonState();
     setSpinAvailability();
@@ -246,6 +262,7 @@
 
     state.currentBet = Number(event.currentTarget.getAttribute("data-bet"));
     setStatus("Ready to spin.");
+    updatePayoffPanel();
     updateProgress();
     setBetButtonState();
     setSpinAvailability();
@@ -349,14 +366,24 @@
 
     state.selectedRating = null;
     els.nextButton.disabled = true;
+    els.modalTitle.classList.remove("is-win", "is-loss");
     buildRatingButtons();
 
     if (isCatchTrial) {
       els.modalTitle.textContent = "Attention Check";
       els.modalMessage.textContent = "Are you still with us? If so, select the number " + state.catchTrials[state.trial] + ".";
+      if (els.scaleLabels) {
+        els.scaleLabels.style.display = "none";
+      }
     } else {
-      els.modalTitle.textContent = result.outcome === "Win" ? "You won" : "You lost";
-      els.modalMessage.textContent = (result.outcome === "Win" ? "You won this spin." : "You lost this spin.") + " Rate your perceived chance of a positive outcome on a scale of 1 to 10.";
+      var tokenText = state.currentBet + " token" + (state.currentBet === 1 ? "" : "s");
+      var isWin = result.outcome === "Win";
+      els.modalTitle.textContent = isWin ? "You won " + tokenText + "!" : "You lost " + tokenText + "!";
+      els.modalTitle.classList.add(isWin ? "is-win" : "is-loss");
+      els.modalMessage.textContent = "";
+      if (els.scaleLabels) {
+        els.scaleLabels.style.display = "grid";
+      }
     }
 
     els.modal.classList.add("is-open");
