@@ -188,12 +188,7 @@
       var isActive = bet === state.currentBet;
       var isChoiceCondition = state.condition === 3;
       button.disabled = !isChoiceCondition || state.isSpinning;
-      button.classList.toggle("border-emerald-600", isActive);
-      button.classList.toggle("bg-emerald-50", isActive);
-      button.classList.toggle("text-emerald-800", isActive);
-      button.classList.toggle("border-slate-300", !isActive);
-      button.classList.toggle("text-slate-800", !isActive);
-      button.classList.toggle("opacity-60", !isChoiceCondition);
+      button.classList.toggle("is-active", isActive);
     });
   }
 
@@ -285,7 +280,7 @@
       button.type = "button";
       button.textContent = String(i);
       button.setAttribute("data-rating", String(i));
-      button.className = "rounded-md border border-slate-300 px-2 py-3 text-sm font-semibold text-slate-800 transition hover:border-emerald-600 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500";
+      button.className = "wof-rating-button";
       button.addEventListener("click", selectRating);
       els.ratingButtons.appendChild(button);
     }
@@ -307,8 +302,7 @@
       els.modalMessage.textContent = (result.outcome === "Win" ? "You won " : "You lost ") + signedBetText + ". Rate your perceived chance of a positive outcome on a scale of 1 to 10.";
     }
 
-    els.modal.classList.remove("hidden");
-    els.modal.classList.add("flex");
+    els.modal.classList.add("is-open");
   }
 
   function selectRating(event) {
@@ -316,9 +310,7 @@
 
     Array.prototype.slice.call(els.ratingButtons.children).forEach(function (button) {
       var isActive = Number(button.getAttribute("data-rating")) === state.selectedRating;
-      button.classList.toggle("border-emerald-600", isActive);
-      button.classList.toggle("bg-emerald-600", isActive);
-      button.classList.toggle("text-white", isActive);
+      button.classList.toggle("is-active", isActive);
     });
 
     els.nextButton.disabled = false;
@@ -339,8 +331,7 @@
   }
 
   function closeModal() {
-    els.modal.classList.add("hidden");
-    els.modal.classList.remove("flex");
+    els.modal.classList.remove("is-open");
   }
 
   function advanceTrial() {
