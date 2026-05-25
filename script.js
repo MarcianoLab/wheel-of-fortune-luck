@@ -16,6 +16,7 @@
     catchTrials: {},
     lastResult: null,
     isSpinning: false,
+    spinFallbackTimer: null,
     qualtricsContext: null
   };
 
@@ -121,14 +122,14 @@
 
   function conditionLabel(condition) {
     if (condition === 1) {
-      return "Condition 1: Fixed wager";
+      return "Complete each spin and answer the prompt.";
     }
 
     if (condition === 2) {
-      return "Condition 2: Randomly assigned wager";
+      return "Complete each spin and answer the prompt.";
     }
 
-    return "Condition 3: Participant-selected wager";
+    return "Choose an option before each spin, then answer the prompt.";
   }
 
   function getRandomBet() {
@@ -158,6 +159,7 @@
     els.currentBet = document.getElementById("wof-current-bet");
     els.bankroll = document.getElementById("wof-bankroll");
     els.betPanel = document.getElementById("wof-bet-panel");
+    els.assignedWager = document.getElementById("wof-assigned-wager");
     els.betButtons = Array.prototype.slice.call(document.querySelectorAll(".wof-bet-button"));
     els.spinButton = document.getElementById("wof-spin-button");
     els.status = document.getElementById("wof-status");
@@ -178,8 +180,27 @@
     var percent = ((completed / TOTAL_TRIALS) * 100).toFixed(2) + "%";
     els.trialLabel.textContent = state.trial + "/" + TOTAL_TRIALS;
     els.progressBar.style.width = percent;
-    els.bankroll.textContent = state.bankroll + " tokens";
-    els.currentBet.textContent = state.currentBet === null ? "-" : state.currentBet + " tokens";
+
+    if (els.bankroll) {
+      els.bankroll.textContent = state.bankroll + " tokens";
+    }
+
+    if (els.currentBet) {
+      els.currentBet.textContent = state.currentBet === null ? "-" : state.currentBet + " tokens";
+    }
+  }
+
+  function updateConditionControls() {
+    var isChoiceCondition = state.condition === 3;
+    var showAssignedMessage = state.condition === 2;
+
+    if (els.betPanel) {
+      els.betPanel.classList.toggle("is-hidden", !isChoiceCondition);
+    }
+
+    if (els.assignedWager) {
+      els.assignedWager.classList.toggle("is-visible", showAssignedMessage);
+    }
   }
 
   function setBetButtonState() {
@@ -203,15 +224,16 @@
 
     if (state.condition === 1) {
       state.currentBet = 5;
-      setStatus("The wager is fixed at 5 tokens.");
+      setStatus("Ready to spin.");
     } else if (state.condition === 2) {
       state.currentBet = getRandomBet();
-      setStatus("The system assigned this trial's wager.");
+      setStatus("Ready to spin.");
     } else {
       state.currentBet = null;
       setStatus("Select a wager to continue.");
     }
 
+    updateConditionControls();
     updateProgress();
     setBetButtonState();
     setSpinAvailability();
@@ -257,15 +279,51 @@
 
     var result = chooseSpinTarget();
     state.lastResult = result;
+
+    if (state.spinFallbackTimer) {
+      window.clearTimeout(state.spinFallbackTimer);
+      state.spinFallbackTimer = null;
+    }
+
+    function completeSpin() {
+      if (!state.isSpinning) {
+        return;
+      }
+
+      finishSpin(result);
+    }
+
+    function handleTransitionEnd(event) {
+      if (event.target !== els.wheel || event.propertyName !== "transform") {
+        return;
+      }
+
+      els.wheel.removeEventListener("transitionend", handleTransitionEnd);
+      completeSpin();
+    }
+
+    els.wheel.addEventListener("transitionend", handleTransitionEnd);
     els.wheel.style.transform = "rotate(" + result.finalRotation + "deg)";
     state.currentRotation = result.finalRotation;
 
-    window.setTimeout(function () {
-      finishSpin(result);
+    state.spinFallbackTimer = window.setTimeout(function () {
+      els.wheel.removeEventListener("transitionend", handleTransitionEnd);
+      completeSpin();
     }, SPIN_DURATION_MS + 150);
   }
 
   function finishSpin(result) {
+    if (!state.isSpinning) {
+      return;
+    }
+
+    state.isSpinning = false;
+
+    if (state.spinFallbackTimer) {
+      window.clearTimeout(state.spinFallbackTimer);
+      state.spinFallbackTimer = null;
+    }
+
     var tokenChange = result.outcome === "Win" ? state.currentBet : -state.currentBet;
     state.bankroll += tokenChange;
     updateProgress();
@@ -288,7 +346,6 @@
 
   function showModal(result) {
     var isCatchTrial = Object.prototype.hasOwnProperty.call(state.catchTrials, state.trial);
-    var signedBetText = state.currentBet + " token" + (state.currentBet === 1 ? "" : "s");
 
     state.selectedRating = null;
     els.nextButton.disabled = true;
@@ -299,7 +356,7 @@
       els.modalMessage.textContent = "Are you still with us? If so, select the number " + state.catchTrials[state.trial] + ".";
     } else {
       els.modalTitle.textContent = result.outcome === "Win" ? "You won" : "You lost";
-      els.modalMessage.textContent = (result.outcome === "Win" ? "You won " : "You lost ") + signedBetText + ". Rate your perceived chance of a positive outcome on a scale of 1 to 10.";
+      els.modalMessage.textContent = (result.outcome === "Win" ? "You won this spin." : "You lost this spin.") + " Rate your perceived chance of a positive outcome on a scale of 1 to 10.";
     }
 
     els.modal.classList.add("is-open");
