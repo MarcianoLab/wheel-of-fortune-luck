@@ -165,14 +165,14 @@
 
   function conditionLabel(condition) {
     if (condition === 1) {
-      return "Complete each spin and answer the prompt.";
+      return "C1.Complete each spin and answer the prompt.";
     }
 
     if (condition === 2) {
-      return "Complete each spin and answer the prompt.";
+      return "C2.Complete each spin and answer the prompt.";
     }
 
-    return "Choose an option before each spin, then answer the prompt.";
+    return "C3.Choose an option before each spin, then answer the prompt.";
   }
 
   function getRandomBet() {
