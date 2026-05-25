@@ -58,6 +58,18 @@
     return null;
   }
 
+  function getQueryParam(key) {
+    var params;
+
+    try {
+      params = new URLSearchParams(window.location.search);
+    } catch (error) {
+      return null;
+    }
+
+    return params.get(key);
+  }
+
   function setQualtricsEmbeddedData(key, value) {
     var storedValue = value === null || typeof value === "undefined" ? "null" : String(value);
 
@@ -105,19 +117,50 @@
   function parseCondition(rawCondition) {
     var condition = String(rawCondition || "").trim().toLowerCase();
 
-    if (condition === "1" || condition === "fixed" || condition === "condition 1") {
-      return 1;
+    if (!condition || condition.indexOf("${") !== -1) {
+      return null;
     }
 
-    if (condition === "2" || condition === "random" || condition === "random exogenous" || condition === "exogenous" || condition === "condition 2") {
-      return 2;
-    }
-
-    if (condition === "3" || condition === "endogenous" || condition === "choice" || condition === "condition 3") {
+    if (condition.indexOf("3") !== -1 || condition.indexOf("endogenous") !== -1 || condition.indexOf("choice") !== -1 || condition.indexOf("choose") !== -1) {
       return 3;
     }
 
-    return 1;
+    if (condition.indexOf("2") !== -1 || condition.indexOf("random") !== -1 || condition.indexOf("exogenous") !== -1 || condition.indexOf("assigned") !== -1) {
+      return 2;
+    }
+
+    if (condition.indexOf("1") !== -1 || condition.indexOf("fixed") !== -1) {
+      return 1;
+    }
+
+    return null;
+  }
+
+  function getConfiguredCondition() {
+    var sources = [
+      getQualtricsEmbeddedData("Condition"),
+      getQualtricsEmbeddedData("condition"),
+      els.root ? els.root.getAttribute("data-condition") : null,
+      getQueryParam("Condition"),
+      getQueryParam("condition")
+    ];
+    var i;
+    var parsed;
+
+    for (i = 0; i < sources.length; i += 1) {
+      parsed = parseCondition(sources[i]);
+      if (parsed) {
+        return {
+          condition: parsed,
+          raw: sources[i]
+        };
+      }
+    }
+
+    return {
+      condition: 1,
+      raw: ""
+    };
   }
 
   function conditionLabel(condition) {
@@ -367,6 +410,7 @@
     state.selectedRating = null;
     els.nextButton.disabled = true;
     els.modalTitle.classList.remove("is-win", "is-loss");
+    els.modalTitle.style.color = "";
     buildRatingButtons();
 
     if (isCatchTrial) {
@@ -380,6 +424,7 @@
       var isWin = result.outcome === "Win";
       els.modalTitle.textContent = isWin ? "You won " + tokenText + "!" : "You lost " + tokenText + "!";
       els.modalTitle.classList.add(isWin ? "is-win" : "is-loss");
+      els.modalTitle.style.color = isWin ? "#15803d" : "#b91c1c";
       els.modalMessage.textContent = "";
       if (els.scaleLabels) {
         els.scaleLabels.style.display = "grid";
@@ -455,7 +500,10 @@
     }
 
     hideQualtricsNext();
-    state.condition = parseCondition(getQualtricsEmbeddedData("Condition"));
+    var conditionInfo = getConfiguredCondition();
+    state.condition = conditionInfo.condition;
+    setQualtricsEmbeddedData("wof_condition_detected", state.condition);
+    setQualtricsEmbeddedData("wof_condition_raw", conditionInfo.raw);
     els.conditionLabel.textContent = conditionLabel(state.condition);
     buildCatchTrials();
     bindEvents();
