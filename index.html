@@ -5,6 +5,7 @@
   }
 
   #wof-experiment {
+    position: relative;
     max-width: 920px;
     margin: 0 auto;
     padding: 20px;
@@ -22,7 +23,7 @@
 
   .wof-header {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 18px;
     margin-bottom: 18px;
   }
@@ -32,8 +33,11 @@
   }
 
   #wof-debug-condition {
+    position: absolute;
+    left: 12px;
+    bottom: 8px;
     display: inline-block;
-    margin-top: 8px;
+    margin-top: 0;
     padding: 3px 8px;
     border: 1px solid #cbd5e1;
     border-radius: 999px;
@@ -42,6 +46,7 @@
     font-size: 11px;
     font-weight: 700;
     line-height: 1.4;
+    z-index: 5;
   }
 
   .wof-stats {
@@ -49,6 +54,8 @@
     grid-template-columns: minmax(90px, 1fr);
     gap: 10px;
     min-width: 160px;
+    max-width: 180px;
+    margin: 0 auto;
   }
 
   .wof-stat {
@@ -56,6 +63,7 @@
     border: 1px solid #e2e8f0;
     border-radius: 6px;
     background: #ffffff;
+    text-align: center;
   }
 
   .wof-stat-label {
@@ -141,7 +149,7 @@
     background: conic-gradient(from 0deg, #16a34a 0deg 288deg, #dc2626 288deg 360deg);
     box-shadow: 0 18px 28px rgba(15, 23, 42, 0.16);
     outline: 1px solid #e2e8f0;
-    transition: transform 3200ms cubic-bezier(0.12, 0.68, 0.1, 1);
+    transition: transform 4800ms cubic-bezier(0.05, 0.78, 0.08, 1);
   }
 
   .wof-wheel-hub {
@@ -411,7 +419,7 @@
     }
 
     .wof-header {
-      justify-content: flex-start;
+      justify-content: center;
     }
 
     .wof-stats {
@@ -450,7 +458,6 @@
     <div class="wof-intro">
       <h2 class="wof-title">Wheel Task</h2>
       <p id="wof-condition-label">Loading condition...</p>
-      <div id="wof-debug-condition">Condition: loading</div>
     </div>
 
     <div class="wof-stats">
@@ -517,6 +524,8 @@
       <button id="wof-next-button" type="button" disabled>Next</button>
     </div>
   </div>
+
+  <div id="wof-debug-condition">Condition: loading</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/gh/MarcianoLab/wheel-of-fortune-luck@test1/script.js?v=6"></script>
