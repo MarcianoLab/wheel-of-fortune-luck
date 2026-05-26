@@ -200,6 +200,7 @@
   function cacheElements() {
     els.root = document.getElementById("wof-experiment");
     els.conditionLabel = document.getElementById("wof-condition-label");
+    els.debugCondition = document.getElementById("wof-debug-condition");
     els.trialLabel = document.getElementById("wof-trial-label");
     els.progressBar = document.getElementById("wof-progress-bar");
     els.currentBet = document.getElementById("wof-current-bet");
@@ -531,6 +532,9 @@
     setQualtricsEmbeddedData("wof_condition_detected", state.condition);
     setQualtricsEmbeddedData("wof_condition_raw", conditionInfo.raw);
     els.conditionLabel.textContent = conditionLabel(state.condition);
+    if (els.debugCondition) {
+      els.debugCondition.textContent = "Condition: " + state.condition + " | raw: " + (conditionInfo.raw || "empty");
+    }
     buildCatchTrials();
     bindEvents();
     prepareTrial();
