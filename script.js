@@ -12,6 +12,9 @@
     bankroll: 0,
     currentBet: null,
     selectedRating: null,
+    pendingLuckyScore: null,
+    attentionResponse: null,
+    modalPhase: "luck",
     currentRotation: 0,
     catchTrials: {},
     lastResult: null,
@@ -158,7 +161,7 @@
     }
 
     return {
-      condition: 1,
+      condition: null,
       raw: ""
     };
   }
@@ -197,6 +200,7 @@
   function cacheElements() {
     els.root = document.getElementById("wof-experiment");
     els.conditionLabel = document.getElementById("wof-condition-label");
+    els.debugCondition = document.getElementById("wof-debug-condition");
     els.trialLabel = document.getElementById("wof-trial-label");
     els.progressBar = document.getElementById("wof-progress-bar");
     els.currentBet = document.getElementById("wof-current-bet");
@@ -277,6 +281,9 @@
 
   function prepareTrial() {
     state.selectedRating = null;
+    state.pendingLuckyScore = null;
+    state.attentionResponse = null;
+    state.modalPhase = "luck";
     state.lastResult = null;
     state.isSpinning = false;
 
@@ -409,29 +416,36 @@
 
     state.selectedRating = null;
     els.nextButton.disabled = true;
+    state.modalPhase = "luck";
     els.modalTitle.classList.remove("is-win", "is-loss");
     els.modalTitle.style.color = "";
     buildRatingButtons();
 
-    if (isCatchTrial) {
-      els.modalTitle.textContent = "Attention Check";
-      els.modalMessage.textContent = "Are you still with us? If so, select the number " + state.catchTrials[state.trial] + ".";
-      if (els.scaleLabels) {
-        els.scaleLabels.style.display = "none";
-      }
-    } else {
-      var tokenText = state.currentBet + " token" + (state.currentBet === 1 ? "" : "s");
-      var isWin = result.outcome === "Win";
-      els.modalTitle.textContent = isWin ? "You won " + tokenText + "!" : "You lost " + tokenText + "!";
-      els.modalTitle.classList.add(isWin ? "is-win" : "is-loss");
-      els.modalTitle.style.color = isWin ? "#15803d" : "#b91c1c";
-      els.modalMessage.textContent = "";
-      if (els.scaleLabels) {
-        els.scaleLabels.style.display = "grid";
-      }
+    var tokenText = state.currentBet + " token" + (state.currentBet === 1 ? "" : "s");
+    var isWin = result.outcome === "Win";
+    els.modalTitle.textContent = isWin ? "You won " + tokenText + "!" : "You lost " + tokenText + "!";
+    els.modalTitle.classList.add(isWin ? "is-win" : "is-loss");
+    els.modalTitle.style.color = isWin ? "#15803d" : "#b91c1c";
+    els.modalMessage.textContent = "";
+    if (els.scaleLabels) {
+      els.scaleLabels.style.display = "grid";
     }
 
     els.modal.classList.add("is-open");
+  }
+
+  function showAttentionStep() {
+    state.modalPhase = "attention";
+    state.selectedRating = null;
+    els.nextButton.disabled = true;
+    els.modalTitle.classList.remove("is-win", "is-loss");
+    els.modalTitle.style.color = "";
+    els.modalTitle.textContent = "Attention Check";
+    els.modalMessage.textContent = "Are you still with us? If so, select the number " + state.catchTrials[state.trial] + ".";
+    if (els.scaleLabels) {
+      els.scaleLabels.style.display = "none";
+    }
+    buildRatingButtons();
   }
 
   function selectRating(event) {
@@ -448,8 +462,8 @@
   function saveTrialData() {
     var prefix = "T" + state.trial + "_";
     var isCatchTrial = Object.prototype.hasOwnProperty.call(state.catchTrials, state.trial);
-    var attentionPassed = isCatchTrial ? state.selectedRating === state.catchTrials[state.trial] : null;
-    var luckyScore = isCatchTrial ? null : state.selectedRating;
+    var attentionPassed = isCatchTrial ? state.attentionResponse === state.catchTrials[state.trial] : null;
+    var luckyScore = isCatchTrial ? state.pendingLuckyScore : state.selectedRating;
 
     setQualtricsEmbeddedData(prefix + "bet_size", state.currentBet);
     setQualtricsEmbeddedData(prefix + "degree_landed", state.lastResult.landedDegree);
@@ -466,6 +480,16 @@
   function advanceTrial() {
     if (state.selectedRating === null || !state.lastResult) {
       return;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(state.catchTrials, state.trial) && state.modalPhase === "luck") {
+      state.pendingLuckyScore = state.selectedRating;
+      showAttentionStep();
+      return;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(state.catchTrials, state.trial) && state.modalPhase === "attention") {
+      state.attentionResponse = state.selectedRating;
     }
 
     saveTrialData();
@@ -500,14 +524,42 @@
     }
 
     hideQualtricsNext();
-    var conditionInfo = getConfiguredCondition();
+    resolveConditionAndStart(0);
+  }
+
+  function startExperiment(conditionInfo) {
     state.condition = conditionInfo.condition;
     setQualtricsEmbeddedData("wof_condition_detected", state.condition);
     setQualtricsEmbeddedData("wof_condition_raw", conditionInfo.raw);
     els.conditionLabel.textContent = conditionLabel(state.condition);
+    if (els.debugCondition) {
+      els.debugCondition.textContent = "Condition: " + state.condition + " | raw: " + (conditionInfo.raw || "empty");
+    }
     buildCatchTrials();
     bindEvents();
     prepareTrial();
+  }
+
+  function resolveConditionAndStart(attempt) {
+    var conditionInfo = getConfiguredCondition();
+    var maxAttempts = window.Qualtrics ? 20 : 1;
+
+    if (conditionInfo.condition) {
+      startExperiment(conditionInfo);
+      return;
+    }
+
+    if (attempt < maxAttempts) {
+      window.setTimeout(function () {
+        resolveConditionAndStart(attempt + 1);
+      }, 100);
+      return;
+    }
+
+    startExperiment({
+      condition: 1,
+      raw: ""
+    });
   }
 
   ready(init);
