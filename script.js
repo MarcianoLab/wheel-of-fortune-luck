@@ -5,6 +5,7 @@
   var WIN_DEGREES = 288;
   var BET_OPTIONS = [1, 5, 10];
   var SPIN_DURATION_MS = 3200;
+  var lastAttentionTarget = null;
 
   var state = {
     condition: 1,
@@ -184,6 +185,7 @@
 
   function buildCatchTrials() {
     var trials = [];
+    var target;
 
     while (trials.length < 2) {
       var candidate = Math.floor(Math.random() * TOTAL_TRIALS) + 1;
@@ -193,7 +195,12 @@
     }
 
     trials.forEach(function (trialNumber) {
-      state.catchTrials[trialNumber] = Math.floor(Math.random() * 10) + 1;
+      do {
+        target = Math.floor(Math.random() * 10) + 1;
+      } while (target === lastAttentionTarget);
+
+      state.catchTrials[trialNumber] = target;
+      lastAttentionTarget = target;
     });
   }
 
@@ -242,14 +249,13 @@
 
   function updateConditionControls() {
     var isChoiceCondition = state.condition === 3;
-    var showAssignedMessage = state.condition === 2;
 
     if (els.betPanel) {
       els.betPanel.classList.toggle("is-hidden", !isChoiceCondition);
     }
 
     if (els.assignedWager) {
-      els.assignedWager.classList.toggle("is-visible", showAssignedMessage);
+      els.assignedWager.classList.remove("is-visible");
     }
   }
 

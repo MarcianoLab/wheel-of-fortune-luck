@@ -22,24 +22,13 @@
 
   .wof-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 18px;
     margin-bottom: 18px;
   }
 
-  .wof-title {
-    margin: 0;
-    font-size: 24px;
-    line-height: 1.2;
-    font-weight: 700;
-    color: #020617;
-  }
-
-  #wof-condition-label {
-    margin: 6px 0 0;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #475569;
+  .wof-intro {
+    display: none;
   }
 
   #wof-debug-condition {
@@ -199,7 +188,7 @@
   }
 
   #wof-assigned-wager.is-visible {
-    display: block;
+    display: none;
   }
 
   #wof-payoff-panel {
@@ -422,7 +411,7 @@
     }
 
     .wof-header {
-      flex-direction: column;
+      justify-content: flex-start;
     }
 
     .wof-stats {
@@ -458,7 +447,7 @@
 
 <div id="wof-experiment" data-condition="${e://Field/Condition}">
   <div class="wof-header">
-    <div>
+    <div class="wof-intro">
       <h2 class="wof-title">Wheel Task</h2>
       <p id="wof-condition-label">Loading condition...</p>
       <div id="wof-debug-condition">Condition: loading</div>
