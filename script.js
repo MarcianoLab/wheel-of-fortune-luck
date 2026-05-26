@@ -4,7 +4,8 @@
   var TOTAL_TRIALS = 20;
   var WIN_DEGREES = 288;
   var BET_OPTIONS = [1, 5, 10];
-  var SPIN_DURATION_MS = 4800;
+  var SPIN_DURATION_MS = 5400;
+  var RESULT_MODAL_DELAY_MS = 450;
   var lastAttentionTarget = null;
 
   var state = {
@@ -188,7 +189,7 @@
     var target;
 
     while (trials.length < 2) {
-      var candidate = Math.floor(Math.random() * TOTAL_TRIALS) + 1;
+      var candidate = Math.floor(Math.random() * (TOTAL_TRIALS - 4)) + 5;
       if (trials.indexOf(candidate) === -1) {
         trials.push(candidate);
       }
@@ -329,7 +330,7 @@
     var desiredRotationMod = normalizeDegrees(360 - landedDegree);
     var currentMod = normalizeDegrees(state.currentRotation);
     var deltaToDesiredMod = normalizeDegrees(desiredRotationMod - currentMod);
-    var fullSpins = 5 + Math.floor(Math.random() * 3);
+    var fullSpins = 4 + Math.floor(Math.random() * 3);
     var finalRotation = state.currentRotation + fullSpins * 360 + deltaToDesiredMod;
     var outcome = landedDegree < WIN_DEGREES ? "Win" : "Loss";
 
@@ -400,7 +401,9 @@
     var tokenChange = result.outcome === "Win" ? state.currentBet : -state.currentBet;
     state.bankroll += tokenChange;
     updateProgress();
-    showModal(result);
+    window.setTimeout(function () {
+      showModal(result);
+    }, RESULT_MODAL_DELAY_MS);
   }
 
   function buildRatingButtons() {
