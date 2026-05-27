@@ -4,7 +4,7 @@
   var TOTAL_TRIALS = 20;
   var WIN_DEGREES = 288;
   var BET_OPTIONS = [1, 5, 10];
-  var SPIN_DURATION_MS = 5400;
+  var SPIN_DURATION_MS = 4400;
   var RESULT_MODAL_DELAY_MS = 450;
   var lastAttentionTarget = null;
 
