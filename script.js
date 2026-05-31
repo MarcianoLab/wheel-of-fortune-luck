@@ -4,7 +4,7 @@
   var TOTAL_TRIALS = 20;
   var WIN_DEGREES = 288;
   var BET_OPTIONS = [1, 5, 10];
-  var SPIN_DURATION_MS = 4400;
+  var SPIN_DURATION_MS = 3520;
   var RESULT_MODAL_DELAY_MS = 450;
   var lastAttentionTarget = null;
 
@@ -224,6 +224,7 @@
     els.modal = document.getElementById("wof-modal");
     els.modalTitle = document.getElementById("wof-modal-title");
     els.modalMessage = document.getElementById("wof-modal-message");
+    els.modalQuestion = document.getElementById("wof-modal-question");
     els.ratingButtons = document.getElementById("wof-rating-buttons");
     els.scaleLabels = document.getElementById("wof-scale-labels");
     els.nextButton = document.getElementById("wof-next-button");
@@ -436,6 +437,10 @@
     els.modalTitle.classList.add(isWin ? "is-win" : "is-loss");
     els.modalTitle.style.color = isWin ? "#15803d" : "#b91c1c";
     els.modalMessage.textContent = "";
+    if (els.modalQuestion) {
+      els.modalQuestion.textContent = "How lucky do you feel?";
+      els.modalQuestion.style.display = "block";
+    }
     if (els.scaleLabels) {
       els.scaleLabels.style.display = "grid";
     }
@@ -451,6 +456,9 @@
     els.modalTitle.style.color = "";
     els.modalTitle.textContent = "Attention Check";
     els.modalMessage.textContent = "Are you still with us? If so, select the number " + state.catchTrials[state.trial] + ".";
+    if (els.modalQuestion) {
+      els.modalQuestion.style.display = "none";
+    }
     if (els.scaleLabels) {
       els.scaleLabels.style.display = "none";
     }

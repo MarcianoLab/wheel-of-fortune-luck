@@ -101,7 +101,7 @@
 
   .wof-main {
     display: grid;
-    grid-template-columns: minmax(320px, 1fr) 280px;
+    grid-template-columns: minmax(320px, 1fr) minmax(320px, 360px);
     align-items: center;
     gap: 32px;
   }
@@ -149,7 +149,7 @@
     background: conic-gradient(from 0deg, #16a34a 0deg 288deg, #dc2626 288deg 360deg);
     box-shadow: 0 18px 28px rgba(15, 23, 42, 0.16);
     outline: 1px solid #e2e8f0;
-    transition: transform 5200ms cubic-bezier(0.1, 0.85, 0.3, 1);
+    transition: transform 3520ms cubic-bezier(0.1, 0.85, 0.3, 1);
   }
 
   .wof-wheel-hub {
@@ -312,28 +312,21 @@
   }
 
   #wof-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 999999;
     display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-    background: rgba(15, 23, 42, 0.5);
-    backdrop-filter: blur(4px);
+    width: 100%;
   }
 
   #wof-modal.is-open {
-    display: flex;
+    display: block;
   }
 
   .wof-modal-panel {
     width: 100%;
-    max-width: 620px;
-    padding: 22px;
-    border-radius: 8px;
+    padding: 18px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
     background: #ffffff;
-    box-shadow: 0 24px 48px rgba(15, 23, 42, 0.26);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
   }
 
   #wof-modal-title {
@@ -361,6 +354,15 @@
 
   #wof-modal-message:empty {
     display: none;
+  }
+
+  #wof-modal-question {
+    margin-top: 8px;
+    color: #334155;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.45;
+    text-align: center;
   }
 
   #wof-rating-buttons {
@@ -429,6 +431,10 @@
 
     .wof-main {
       grid-template-columns: 1fr;
+    }
+
+    #wof-modal {
+      margin-top: 4px;
     }
   }
 
@@ -509,22 +515,22 @@
 
       <button id="wof-spin-button" type="button">Spin</button>
       <div id="wof-status">Prepare for the first trial.</div>
-    </div>
-  </div>
 
-  <div id="wof-modal">
-    <div class="wof-modal-panel">
-      <div id="wof-modal-title">Result</div>
-      <div id="wof-modal-message"></div>
-      <div id="wof-rating-buttons"></div>
-      <div id="wof-scale-labels" class="wof-scale-labels">
-        <div class="wof-scale-low">not lucky</div>
-        <div class="wof-scale-high">extremely lucky</div>
+      <div id="wof-modal">
+        <div class="wof-modal-panel">
+          <div id="wof-modal-title">Result</div>
+          <div id="wof-modal-message"></div>
+          <div id="wof-modal-question">How lucky do you feel?</div>
+          <div id="wof-rating-buttons"></div>
+          <div id="wof-scale-labels" class="wof-scale-labels">
+            <div class="wof-scale-low">not lucky</div>
+            <div class="wof-scale-high">extremely lucky</div>
+          </div>
+          <button id="wof-next-button" type="button" disabled>Next</button>
+        </div>
       </div>
-      <button id="wof-next-button" type="button" disabled>Next</button>
     </div>
   </div>
-
- 
+</div>
 
 <script src="https://marcianolab.github.io/wheel-of-fortune-luck/script.js"></script>
