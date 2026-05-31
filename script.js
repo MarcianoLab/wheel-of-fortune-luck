@@ -445,6 +445,9 @@
       els.scaleLabels.style.display = "grid";
     }
 
+    if (els.root) {
+      els.root.classList.add("has-result-panel");
+    }
     els.modal.classList.add("is-open");
   }
 
@@ -492,6 +495,9 @@
 
   function closeModal() {
     els.modal.classList.remove("is-open");
+    if (els.root) {
+      els.root.classList.remove("has-result-panel");
+    }
   }
 
   function advanceTrial() {
